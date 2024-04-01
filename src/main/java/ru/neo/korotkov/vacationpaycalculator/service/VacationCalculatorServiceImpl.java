@@ -2,10 +2,12 @@ package ru.neo.korotkov.vacationpaycalculator.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import ru.neo.korotkov.vacationpaycalculator.utils.Holiday;
-import ru.neo.korotkov.vacationpaycalculator.utils.HolidayResponse;
+import ru.neo.korotkov.vacationpaycalculator.util.Holiday;
+import ru.neo.korotkov.vacationpaycalculator.util.HolidayResponse;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -16,6 +18,10 @@ import java.util.List;
 @Service
 public class VacationCalculatorServiceImpl implements VacationCalculatorService {
 
+    @Value("${holiday-api.key}")
+    private String API_KEY;
+
+    @SneakyThrows
     @Override
     public double calculateVacationPay(double salary, LocalDate fromDate, LocalDate toDate) {
         long weekendsCount = fromDate.datesUntil(toDate.plusDays(1))
@@ -25,11 +31,9 @@ public class VacationCalculatorServiceImpl implements VacationCalculatorService 
         long daysBetween = ChronoUnit.DAYS.between(fromDate, toDate) + 1 - weekendsCount;
 
         List<Holiday> holidays;
-        try {
-            holidays = getDaysOff(fromDate.getYear());
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+
+
+        holidays = getDaysOff(fromDate.getYear());
 
         long publicHolidaysCount = holidays.stream()
                 .filter(holiday -> {
@@ -47,12 +51,10 @@ public class VacationCalculatorServiceImpl implements VacationCalculatorService 
 
     private List<Holiday> getDaysOff(int year) throws JsonProcessingException {
 
-        //todo hide api key
         String url = "https://holidayapi.com/v1/holidays" +
-                "?key=" + "7968cb11-20ae-42e4-b7b2-e677feb5fa8c" +
+                "?key=" + API_KEY +
                 "&country=RU" +
                 "&year=" + year +
-                "&pretty" +
                 "&public=true";
 
         RestTemplate restTemplate = new RestTemplate();

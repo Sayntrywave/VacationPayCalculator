@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: VacationPayCalculator
+
+
+holiday-api:
+  key: ${HOLIDAY_API_KEY}

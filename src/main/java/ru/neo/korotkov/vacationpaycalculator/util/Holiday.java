@@ -1,4 +1,4 @@
-package ru.neo.korotkov.vacationpaycalculator.utils;
+package ru.neo.korotkov.vacationpaycalculator.util;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
@@ -14,5 +14,4 @@ import java.util.Date;
 public final class Holiday {
     private String name;
     private Date date;
-
 }
