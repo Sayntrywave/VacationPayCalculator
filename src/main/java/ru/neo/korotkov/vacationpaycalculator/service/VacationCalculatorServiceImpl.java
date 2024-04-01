@@ -18,6 +18,9 @@ import java.util.List;
 @Service
 public class VacationCalculatorServiceImpl implements VacationCalculatorService {
 
+
+    private final double AVERAGE_WORKING_DAYS_IN_MONTH = 21.75;
+
     @Value("${holiday-api.key}")
     private String API_KEY;
 
@@ -30,10 +33,13 @@ public class VacationCalculatorServiceImpl implements VacationCalculatorService 
 
         long daysBetween = ChronoUnit.DAYS.between(fromDate, toDate) + 1 - weekendsCount;
 
-        List<Holiday> holidays;
+        int fromDateYear = fromDate.getYear();
+        int toDateYear = toDate.getYear();
+        List<Holiday> holidays = getDaysOff(fromDateYear);
 
-
-        holidays = getDaysOff(fromDate.getYear());
+        if (fromDateYear != toDateYear){
+            holidays.addAll(getDaysOff(toDateYear));
+        }
 
         long publicHolidaysCount = holidays.stream()
                 .filter(holiday -> {
@@ -43,7 +49,7 @@ public class VacationCalculatorServiceImpl implements VacationCalculatorService 
                 })
                 .count();
 
-        double averageDailySalary = salary / 21.75;
+        double averageDailySalary = salary / AVERAGE_WORKING_DAYS_IN_MONTH;
 
         return (daysBetween - publicHolidaysCount) * averageDailySalary;
     }
